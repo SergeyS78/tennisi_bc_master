@@ -7,7 +7,7 @@ flask run
 """
 
 import time
-from flask import Flask, current_app, g, request
+from flask import Flask, g, request
 from flask_docs import ApiDoc
 from flask_log_request_id import RequestID
 import seqlog
