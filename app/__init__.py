@@ -51,7 +51,7 @@ def create_app(config_class=Config):
     db.init_app(app)
     app.json_encoder = JsonEncoder
 
-    seq_log_conf = json.loads(app.config['SEQ_LOG_CONF'])
+    seq_log_conf = app.config['SEQ_LOG_CONF']
     seqlog.log_to_seq(
         server_url=seq_log_conf['server_url'],
         api_key=seq_log_conf['api_key'],
@@ -60,8 +60,9 @@ def create_app(config_class=Config):
         auto_flush_timeout=seq_log_conf['auto_flush_timeout'],  # seconds
         override_root_logger=seq_log_conf['override_root_logger'],
         json_encoder_class=app.json_encoder, )
-    app.add_url_rule('/', endpoint='index')
 
     app.register_blueprint(main.bp)
+
+    app.add_url_rule('/', endpoint='index')
 
     return app

@@ -14,8 +14,8 @@ class Config(object):
     """Параметры запуска Flask приложения"""
 
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'you-will-never-guess'
-    PROJECT_DATA_BASES = os.environ.get('PROJECT_DATA_BASES') or PROJECT_DATA_BASES
-    SEQ_LOG_CONF = os.environ.get('SEQ_LOG_CONF') or SEQ_LOG_CONF
+    PROJECT_DATA_BASES = json.loads(os.environ.get('PROJECT_DATA_BASES')) or PROJECT_DATA_BASES
+    SEQ_LOG_CONF = json.loads(os.environ.get('SEQ_LOG_CONF')) or SEQ_LOG_CONF
 
     # API_DOC: настройки авто документирования проекта
     API_DOC_MEMBER = ['basket', 'hockey', 'soccer']
