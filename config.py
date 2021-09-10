@@ -10,6 +10,7 @@ load_dotenv(os.path.join(BASEDIR, '.env'))
 PROJECT_DATA_BASES = ''
 SEQ_LOG_CONF = ''
 
+
 class Config(object):
     """Параметры запуска Flask приложения"""
 
@@ -24,7 +25,7 @@ class Config(object):
 
 
 class JsonEncoder(json.JSONEncoder):
-    """Определение метода сериализации данных типа Decimal в json формат."""
+    """Добавление метода сериализации данных типа Decimal в json формат."""
 
     def default(self, obj):
         if isinstance(obj, decimal.Decimal):

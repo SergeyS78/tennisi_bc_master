@@ -43,7 +43,6 @@ def create_app(config_class=Config):
         /basket/.../.../
 
     app.add_url_rule() -  установит '/' как index для всех разделов.
-    Раздел /basket/ --> basket.index.
     """
 
     app = Flask(__name__)
@@ -53,14 +52,14 @@ def create_app(config_class=Config):
     db.init_app(app)
     app.json_encoder = JsonEncoder
 
-    seq_log_conf = app.config['SEQ_LOG_CONF']
+    seq_log_config = app.config['SEQ_LOG_CONF']
     seqlog.log_to_seq(
-        server_url=seq_log_conf['server_url'],
-        api_key=seq_log_conf['api_key'],
-        level=seq_log_conf['level'],
-        batch_size=seq_log_conf['batch_size'],
-        auto_flush_timeout=seq_log_conf['auto_flush_timeout'],  # seconds
-        override_root_logger=seq_log_conf['override_root_logger'],
+        server_url=seq_log_config['server_url'],
+        api_key=seq_log_config['api_key'],
+        level=seq_log_config['level'],
+        batch_size=seq_log_config['batch_size'],
+        auto_flush_timeout=seq_log_config['auto_flush_timeout'],  # seconds
+        override_root_logger=seq_log_config['override_root_logger'],
         json_encoder_class=app.json_encoder, )
 
     app.register_blueprint(main.bp)
@@ -70,7 +69,7 @@ def create_app(config_class=Config):
     @app.before_request
     def before_request():
         """Перед началом обработки запроса"""
-        data_bases_names = current_app.config["PROJECT_DATA_BASES"].keys()
+        data_bases_names = app.config["PROJECT_DATA_BASES"].keys()
         g.db_connections = dict.fromkeys(data_bases_names)
         g.start = time.time()
         logging_into_seq.send_log_to_seq(
