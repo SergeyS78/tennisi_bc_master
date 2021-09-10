@@ -4,6 +4,7 @@
 import inspect
 import logging
 from pathlib import Path
+from flask import current_app
 from flask_log_request_id import current_request_id
 import seqlog
 
@@ -30,8 +31,9 @@ def send_log_to_seq(msg, properties={}):
 
     seqlog.set_global_log_properties(**properties)
 
-    logger = get_logger(module_name)
-    logger.info(msg)
+    current_app.logger.info(msg)
+    # logger = get_logger(module_name)
+    # logger.info(msg)
 
 
 def get_logger(name):
