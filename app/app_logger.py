@@ -23,7 +23,7 @@ def send_log_to_seq(msg, properties={}):
     module_name = ".".join(parts[-3:])
     lineno = inspect.currentframe().f_back.f_lineno
 
-    properties['AssemblyName'] = "STAT_API"
+    properties['AssemblyName'] = "bc_master"
     properties['current_request_id'] = request_id
     properties['func_name'] = func_name
     properties['module_name'] = module_name
