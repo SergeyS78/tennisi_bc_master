@@ -2,7 +2,6 @@
 Используется библиотека seqlog. Работает через стандартный логгер Python"""
 
 import inspect
-import logging
 from pathlib import Path
 from flask import current_app
 from flask_log_request_id import current_request_id
@@ -32,13 +31,3 @@ def send_log_to_seq(msg, properties={}):
     seqlog.set_global_log_properties(**properties)
 
     current_app.logger.info(msg)
-    # logger = get_logger(module_name)
-    # logger.info(msg)
-
-
-def get_logger(name):
-    """Создает логгер с именем, равным имени модуля из которой он запущен"""
-
-    logger = logging.getLogger(name)
-
-    return logger
