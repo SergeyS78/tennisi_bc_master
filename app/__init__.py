@@ -15,7 +15,7 @@ import seqlog
 import app.database as db
 from config import Config, JsonEncoder
 from app.main import routes as main
-from app import logger_into_seq
+from app import logging_into_seq
 
 
 def create_app(config_class=Config):
@@ -73,15 +73,15 @@ def create_app(config_class=Config):
         data_bases_names = current_app.config["PROJECT_DATA_BASES"].keys()
         g.db_connections = dict.fromkeys(data_bases_names)
         g.start = time.time()
-        logger_into_seq.send_log_to_seq(
+        logging_into_seq.send_log_to_seq(
             f"Get request, path: {request.path}")
 
     @app.after_request
     def after_request(response):
         """По окончании выполнения запроса"""
         diff = time.time() - g.start
-        logger_into_seq.send_log_to_seq(f"Запрос обработан.",
-                                        {"elapsed_time": diff})
+        logging_into_seq.send_log_to_seq(f"Запрос обработан.",
+                                         {"elapsed_time": diff})
         return response
 
     return app

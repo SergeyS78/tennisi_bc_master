@@ -12,7 +12,7 @@ import psycopg2.extras
 from psycopg2 import Error, pool
 from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
 from flask import current_app, g, request
-from app import logger_into_seq
+from app import logging_into_seq
 
 POOLS = {}
 
@@ -51,7 +51,7 @@ def open_db_connection(db_name):
         if db_name not in POOLS:
             POOLS[db_name] = psycopg2.pool.ThreadedConnectionPool(
                 **current_app.config[f"DATABASES"][db_name])
-            logger_into_seq.send_log_to_seq(
+            logging_into_seq.send_log_to_seq(
                 f"PostgreSQL - - Пул соединений для '{db_name}' создан успешно.")
 
         # Получаем соединение из пула соединений.
@@ -60,7 +60,7 @@ def open_db_connection(db_name):
             connection.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
 
     except (Exception, psycopg2.DatabaseError) as err:
-        logger_into_seq.send_log_to_seq(
+        logging_into_seq.send_log_to_seq(
             f"PostgreSQL - - ошибка при подключении к '{db_name}': {err}")
         raise err from None
 
@@ -83,7 +83,7 @@ def get_db_connection(db_name):
     if g.db_connections[db_name] is None:
         g.db_connections[db_name] = open_db_connection(db_name)
 
-    logger_into_seq.send_log_to_seq(
+    logging_into_seq.send_log_to_seq(
         f"PostgreSQL - - Соединение с {db_name} установлено.")
 
     return g.db_connections[db_name]
@@ -103,7 +103,7 @@ def close_db(e=None):
         if connection is not None:
             connection.cursor().close()
             POOLS[db_name].putconn(connection)
-            logger_into_seq.send_log_to_seq(
+            logging_into_seq.send_log_to_seq(
                 f"PostgreSQL - - соединение c '{db_name}' вернулось в пул.")
 
     g.pop('db_connections')
@@ -133,7 +133,7 @@ def get_row_count(cursor):
     try:
         count = cursor.rowcount
     except (Exception, Error) as err:
-        logger_into_seq.send_log_to_seq(f"Ошибка при работе с PostgreSQL: {err}")
+        logging_into_seq.send_log_to_seq(f"Ошибка при работе с PostgreSQL: {err}")
         raise
 
     return count
@@ -156,8 +156,8 @@ def execute_sql(query, data_for_query=None, db_name=None):
         cursor_factory=psycopg2.extras.RealDictCursor)
 
     query = ' '.join(query.split())
-    logger_into_seq.send_log_to_seq(f"PostgreSQL - - Выполняется запрос.",
-                                    {"sql": cursor.mogrify(query, data_for_query)})
+    logging_into_seq.send_log_to_seq(f"PostgreSQL - - Выполняется запрос.",
+                                     {"sql": cursor.mogrify(query, data_for_query)})
 
     cursor.execute(query, data_for_query)
 
@@ -173,7 +173,7 @@ def execute_and_fetchall_sql(query, data_for_query=None, db_name=None):
         cursor = execute_sql(query=query, db_name=db_name, data_for_query=data_for_query)
         records = cursor.fetchall()
     except (Exception, Error) as err:
-        logger_into_seq.send_log_to_seq(f"Ошибка при работе с PostgreSQL: {err}")
+        logging_into_seq.send_log_to_seq(f"Ошибка при работе с PostgreSQL: {err}")
         raise
 
     return records
@@ -187,7 +187,7 @@ def execute_and_fetchone_sql(query, data_for_query=None, db_name=None):
         cursor = execute_sql(query=query, db_name=db_name, data_for_query=data_for_query)
         records = cursor.fetchone()
     except (Exception, Error) as err:
-        logger_into_seq.send_log_to_seq(f"Ошибка при работе с PostgreSQL: {err}")
+        logging_into_seq.send_log_to_seq(f"Ошибка при работе с PostgreSQL: {err}")
         raise
 
     return records
@@ -208,18 +208,18 @@ def execute_sql_list_as_transaction(queries, db_name=None):
         db_connection.autocommit = False
         cursor = db_connection.cursor
 
-        logger_into_seq.send_log_to_seq("PostgreSQL - - Начало транзакции.")
+        logging_into_seq.send_log_to_seq("PostgreSQL - - Начало транзакции.")
 
         for query in queries:
-            logger_into_seq.send_log_to_seq(
+            logging_into_seq.send_log_to_seq(
                 f"PostgreSQL - - Выполняется запрос:\t{query[0]}.")
             cursor.execute(query)
 
-        logger_into_seq.send_log_to_seq(
+        logging_into_seq.send_log_to_seq(
             "PostgreSQL - - Транзакция успешно завершена.")
 
     except (Exception, psycopg2.DatabaseError) as error:
-        logger_into_seq.send_log_to_seq(
+        logging_into_seq.send_log_to_seq(
             f"PostgreSQL - - Ошибка в транзакции. "
             f"Отмена всех остальных операций транзакции: {error}")
         if db_connection:
@@ -233,7 +233,7 @@ def insert(query, data_for_query=None, db_name=None):
     db_name = check_db_name(db_name)
 
     cursor = execute_sql(query=query, db_name=db_name, data_for_query=data_for_query)
-    logger_into_seq.send_log_to_seq(
+    logging_into_seq.send_log_to_seq(
         f"PostgreSQL - - {get_row_count(cursor)} запись(ей) успешно добавлена в таблицу.")
 
     return 'ок'
@@ -245,7 +245,7 @@ def update(query, data_for_query=None, db_name=None):
     db_name = check_db_name(db_name)
 
     cursor = execute_sql(query=query, db_name=db_name, data_for_query=data_for_query)
-    logger_into_seq.send_log_to_seq(
+    logging_into_seq.send_log_to_seq(
         f"PostgreSQL - - {get_row_count(cursor)} запись успешно обновлена.")
 
     return 'ок'
@@ -257,7 +257,7 @@ def delete(query, data_for_query=None, db_name=None):
     db_name = check_db_name(db_name)
 
     cursor = execute_sql(query=query, db_name=db_name, data_for_query=data_for_query)
-    logger_into_seq.send_log_to_seq(
+    logging_into_seq.send_log_to_seq(
         f"PostgreSQL - - {get_row_count(cursor)} запись успешно удалена.")
 
     return 'ок'
@@ -269,7 +269,7 @@ def select_all(query, data_for_query=None, db_name=None):
     db_name = check_db_name(db_name)
 
     result = execute_and_fetchall_sql(query=query, data_for_query=data_for_query, db_name=db_name)
-    logger_into_seq.send_log_to_seq(
+    logging_into_seq.send_log_to_seq(
         f"PostgreSQL - - {len(result)} запись(ей) получено.")
 
     return result
@@ -280,7 +280,7 @@ def select_one(query, data_for_query=None, db_name=None):
     db_name = check_db_name(db_name)
 
     result = execute_and_fetchone_sql(query=query, data_for_query=data_for_query, db_name=db_name)
-    logger_into_seq.send_log_to_seq(
+    logging_into_seq.send_log_to_seq(
         f"PostgreSQL - - {len(result)} запись(ей) получено.")
 
     return result
