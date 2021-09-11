@@ -4,8 +4,6 @@ from flask import Blueprint, current_app, jsonify
 bp = Blueprint('main', __name__, url_prefix='/api')
 
 
-
-
 @bp.route('/get_leagues_api_new/')
 def get_leagues_api_new():
     """
@@ -36,4 +34,3 @@ def get_leagues_api_new():
         res = {'error': 'it was an error'}
 
     return jsonify(res)
-
