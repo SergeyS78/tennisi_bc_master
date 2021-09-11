@@ -46,6 +46,6 @@ class Config(object):
     SEQ_LOG_CONF = json_loads(os.environ.get('SEQ_LOG_CONF')) or SEQ_LOG_CONF
 
     # API_DOC: настройки авто документирования проекта
-    API_DOC_MEMBER = ['basket', 'hockey', 'soccer']
+    API_DOC_MEMBER = ['api']
     # RESTful Api документы, которые должны быть исключены
     RESTFUL_API_DOC_EXCLUDE = []

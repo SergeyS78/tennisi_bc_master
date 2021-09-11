@@ -14,8 +14,7 @@ import seqlog
 
 import app.database as db
 from config import Config, JsonEncoder
-from app.main import routes as main
-from app import logging_into_seq
+from app import logging_into_seq, urls as main
 
 
 def create_app(config_class=Config):
@@ -65,6 +64,10 @@ def create_app(config_class=Config):
     app.register_blueprint(main.bp)
 
     app.add_url_rule('/', endpoint='index')
+
+    @app.route('/')
+    def index():
+        return 'bc_master is running'
 
     @app.before_request
     def before_request():
