@@ -1,6 +1,6 @@
 import app.views as views
 from flask import Blueprint, current_app, jsonify
-from app.views.functions import log_this_into_seq as log_this
+from app.views.commons import log_this_into_seq as log_this
 import logging
 
 bp = Blueprint('main', __name__, url_prefix='/api')
