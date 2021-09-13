@@ -1,5 +1,6 @@
 """Перенос функционала getLeaguesAPINEW"""
 
-def get_leagues_api_new(data: dict = None)->dict:
+
+def get_leagues_api_new(data=None):
     """Перенос функции getLeaguesAPINEW."""
-    pass
+    return 2/0

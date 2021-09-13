@@ -1,10 +1,12 @@
 import app.views as views
 from flask import Blueprint, current_app, jsonify
+from app.views.functions import log_this_into_seq as log_this
 
 bp = Blueprint('main', __name__, url_prefix='/api')
 
 
 @bp.route('/get_leagues_api_new/')
+@log_this
 def get_leagues_api_new():
     """
     @@@
@@ -23,14 +25,10 @@ def get_leagues_api_new():
 
     Обрабатывается модулем clean_matches_wo_sources.
 
-    В оригинальной программе роут "clean_matches_wo_sources".
+    В оригинальной программе роутер "getLeaguesAPINEW".
     @@@
     """
 
-    try:
-        res = views.get_leagues_api_new()
-    except Exception as err:
-        current_app.logger.error(err, exc_info=True)
-        res = {'error': 'it was an error'}
+    res = views.get_leagues_api_new()
 
     return jsonify(res)
